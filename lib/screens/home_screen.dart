@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hawker_hub/utilities/constants.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,6 +10,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final double _initFabHeight = 100.0;
+  double _fabHeight = 0;
+  double _panelHeightOpen = 0;
+  final double _panelHeightClosed = 95.0;
+
   late GoogleMapController mapController;
 
   final LatLng _center = const LatLng(45.521563, -122.677433);
@@ -20,27 +24,62 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    _fabHeight = _initFabHeight;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SlidingUpPanel(
-          renderPanelSheet: false,
-          panel: _floatingPanel(context),
-          collapsed: _floatingCollapsed(context),
-          body: GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: _center,
-              zoom: 11.0,
+    _panelHeightOpen = MediaQuery.of(context).size.height * .50;
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: <Widget>[
+        SlidingUpPanel(
+            maxHeight: _panelHeightOpen,
+            minHeight: _panelHeightClosed,
+            parallaxEnabled: true,
+            renderPanelSheet: false,
+            panel: _floatingPanel(context),
+            collapsed: _floatingCollapsed(context),
+            body: GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 11.0,
+              ),
             ),
-          )),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Add your onPressed code here!
-        },
-        label: const Text('Contribute'),
-        icon: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            onPanelSlide: (double pos) => setState(() {
+                  _fabHeight = pos * (_panelHeightOpen - _panelHeightClosed) +
+                      _initFabHeight;
+                })),
+        Positioned(
+          right: 20.0,
+          bottom: _fabHeight,
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              // Add your onPressed code here!
+            },
+            label: const Text('Contribute'),
+            icon: const Icon(Icons.add),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+          child: const TextField(
+              autofocus: false,
+              decoration: InputDecoration(
+                hintText: "Name, Category, Food trucks..",
+                prefixIcon: Icon(Icons.search),
+                suffixIcon: Icon(Icons.cancel_outlined),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(),
+                labelText: 'Search',
+              )),
+        )
+      ],
     );
   }
 
@@ -51,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0)),
       ),
-      margin: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
+      margin: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
       child: Center(
         child: Text("Explore", style: Theme.of(context).textTheme.titleLarge),
       ),
@@ -66,11 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
               topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0)),
           boxShadow: const [
             BoxShadow(
-              blurRadius: 20.0,
+              blurRadius: 10.0,
               color: Colors.grey,
             ),
           ]),
-      margin: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
+      margin: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
       child: const Center(
         child: Text("Explore More Places"),
       ),
