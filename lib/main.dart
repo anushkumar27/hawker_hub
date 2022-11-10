@@ -25,12 +25,14 @@ class MyApp extends StatelessWidget {
       home: AnimatedSplashScreen(
         duration: 2000,
         splash: 'lib/assets/logo.png',
-        nextScreen: Scaffold(
-            appBar: AppBar(
-              title: const Center(child: Text(Constants.appName)),
-              backgroundColor: Constants.primarySurfaceColor,
-            ),
-            body: const HomeScreen()),
+        nextScreen: SafeArea(
+            child: SizedBox.expand(
+                child: Scaffold(
+                    appBar: AppBar(
+                      title: const Center(child: Text(Constants.appName)),
+                      backgroundColor: Constants.primarySurfaceColor,
+                    ),
+                    body: const HomeScreen()))),
         splashTransition: SplashTransition.slideTransition,
         pageTransitionType: PageTransitionType.rightToLeftWithFade,
       ),

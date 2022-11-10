@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
             maxHeight: _panelHeightOpen,
             minHeight: _panelHeightClosed,
             parallaxEnabled: true,
+            parallaxOffset: .5,
             renderPanelSheet: false,
             panel: _floatingPanel(context),
             collapsed: _floatingCollapsed(context),
@@ -92,8 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       margin: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
       child: Center(
-        child: Text("Explore", style: Theme.of(context).textTheme.titleLarge),
-      ),
+          child: Text("Explore Hubs",
+              style: Theme.of(context).textTheme.headlineSmall)),
     );
   }
 
@@ -110,9 +111,101 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ]),
       margin: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
-      child: const Center(
-        child: Text("Explore More Places"),
-      ),
+      padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+      child: Center(
+          child: ListView(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 30,
+                height: 5,
+                decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius:
+                        const BorderRadius.all(Radius.circular(12.0))),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 18.0,
+          ),
+          for (int i = 0; i < 6; i++) ...[
+            Card(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(12)),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Container(
+                          margin: const EdgeInsets.only(right: 20),
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                              child: Text("4.1",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontStyle: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.fontStyle,
+                                      color: Colors.white)))),
+                      Expanded(
+                        /*1*/
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            /*2*/
+                            Text(
+                              "La Raquita",
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Text(
+                              "Food | Open Now",
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            "10:00 AM",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                          Text(
+                            "to",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                          Text(
+                            "12:00 PM",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+        ],
+      )),
     );
   }
 }
