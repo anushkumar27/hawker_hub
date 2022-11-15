@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final double _minExplorePanelHeight = 95.0;
   final LatLng _center = const LatLng(45.521563, -122.677433);
   final _explorePanelMargins = const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0);
-  final _explorePanelDrawerIndication = Row(
+  final _explorePanelDrawerIndicator = Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
       Container(
@@ -140,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Center(
           child: ListView(
         children: <Widget>[
-          _explorePanelDrawerIndication,
+          _explorePanelDrawerIndicator,
           _explorePanelPaddingBox,
           for (int i = 0; i < 6; i++) ...[const HubDetailsHorizontalCard()],
         ],
