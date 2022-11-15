@@ -5,11 +5,26 @@ import 'package:flutter/material.dart';
 import 'utilities/constants.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(HawkerHubRoot());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HawkerHubRoot extends StatelessWidget {
+  HawkerHubRoot({super.key});
+
+  final Widget splashScreen = AnimatedSplashScreen(
+    duration: 2000,
+    splash: 'lib/assets/logo.png',
+    nextScreen: SafeArea(
+        child: SizedBox.expand(
+            child: Scaffold(
+                appBar: AppBar(
+                  title: const Center(child: Text(Constants.appName)),
+                  backgroundColor: Constants.primarySurfaceColor,
+                ),
+                body: const HomeScreen()))),
+    splashTransition: SplashTransition.slideTransition,
+    pageTransitionType: PageTransitionType.rightToLeftWithFade,
+  );
 
   // This widget is the root of your application.
   @override
@@ -22,20 +37,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
         colorSchemeSeed: const Color(0xff6750a4),
       ),
-      home: AnimatedSplashScreen(
-        duration: 2000,
-        splash: 'lib/assets/logo.png',
-        nextScreen: SafeArea(
-            child: SizedBox.expand(
-                child: Scaffold(
-                    appBar: AppBar(
-                      title: const Center(child: Text(Constants.appName)),
-                      backgroundColor: Constants.primarySurfaceColor,
-                    ),
-                    body: const HomeScreen()))),
-        splashTransition: SplashTransition.slideTransition,
-        pageTransitionType: PageTransitionType.rightToLeftWithFade,
-      ),
+      home: splashScreen,
     );
   }
 }
