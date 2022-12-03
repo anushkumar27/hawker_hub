@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hawker_hub/screens/search_screen.dart';
+import 'package:hawker_hub/screens/contribute_screen.dart';
 import 'package:hawker_hub/widgets/hub_details_horizontal_card.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -77,7 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: _currentContributeButtonHeight,
         child: FloatingActionButton.extended(
           onPressed: () {
-            // Add your onPressed code here!
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ContributeScreen()),
+            );
           },
           label: const Text('Contribute'),
           icon: const Icon(Icons.add),
