@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hawker_hub/screens/search_screen.dart';
 import 'package:hawker_hub/screens/contribute_screen.dart';
 import 'package:hawker_hub/widgets/hub_details_horizontal_card.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -89,9 +90,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _searchTextFieldContainer(BuildContext context) => Container(
         margin: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-        child: const TextField(
+        child: TextField(
             autofocus: false,
-            decoration: InputDecoration(
+            onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchScreen()),
+                ),
+            decoration: const InputDecoration(
               hintText: "Name, Category, Food trucks..",
               prefixIcon: Icon(Icons.search),
               suffixIcon: Icon(Icons.cancel_outlined),

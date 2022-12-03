@@ -7,7 +7,7 @@ class HubDetailsVerticalCard extends HubDetailsBaseCard {
   HubDetailsVerticalCard({super.key});
 
   final Widget _hubImage = Image.network(
-    'https://via.placeholder.com/150',
+    'https://source.unsplash.com/user/c_v_r/150x150',
     width: 600,
     height: 240,
     fit: BoxFit.fill,
