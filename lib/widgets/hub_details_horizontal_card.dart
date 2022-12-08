@@ -36,6 +36,7 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Take care of multiple locations
     return Card(
         shape: DesignConstants.hubDetailsCardShape(context),
         child: Container(

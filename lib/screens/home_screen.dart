@@ -55,18 +55,41 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
-    Provider.of<HubProvider>(context, listen: false).fetchAllHubs();
     _currentContributeButtonHeight = _initialContributeButtonHeight;
+
+    // Get all the hubs
+    Provider.of<HubProvider>(context, listen: false).fetchAllHubs();
   }
 
-  Widget _explorePanel(BuildContext context) => SlidingUpPanel(
+  Set<Marker> getHubMarkers(ApiResponse<List<Hub>> hubDetails) {
+    Set<Marker> markers = {};
+    if (hubDetails.requestStatus != RequestStatus.completed) return markers;
+
+    for (Hub hub in hubDetails.data) {
+      hub.hubLocations.asMap().forEach((index, hubLocation) => markers.add(
+          Marker(
+              // Index is appended as one hub can have multiple locations
+              markerId: MarkerId(hub.hubId + index.toString()),
+              position:
+                  LatLng(hubLocation.hubLatitude, hubLocation.hubLogitude),
+              infoWindow: InfoWindow(
+                title: "${hub.hubName} (${hub.hubRating})",
+                snippet: hubLocation.hubAddress,
+              ))));
+    }
+
+    return markers;
+  }
+
+  Widget _explorePanel(
+          BuildContext context, ApiResponse<List<Hub>> hubDetails) =>
+      SlidingUpPanel(
         maxHeight: _maxExplorePanelHeight,
         minHeight: _minExplorePanelHeight,
         parallaxEnabled: true,
         parallaxOffset: .5,
         renderPanelSheet: false,
-        panel: _explorePanelBody(context),
+        panel: _explorePanelBody(context, hubDetails),
         collapsed: _explorePanelCollapsed(context),
         body: GoogleMap(
           onMapCreated: _onMapCreated,
@@ -74,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
             target: _center,
             zoom: 11.0,
           ),
+          markers: getHubMarkers(hubDetails),
         ),
         onPanelSlide: _updateContributeButtonPosition,
       );
@@ -118,9 +142,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Stack(
       alignment: Alignment.topCenter,
       children: <Widget>[
-        _explorePanel(context),
+        Consumer<HubProvider>(
+            builder: (context, hubDetails, child) =>
+                _explorePanel(context, hubDetails.hubs)),
         _contributeButton(context),
-        _searchTextFieldContainer(context)
+        _searchTextFieldContainer(context),
       ],
     );
   }
@@ -175,7 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _explorePanelBody(BuildContext context) {
+  Widget _explorePanelBody(
+      BuildContext context, ApiResponse<List<Hub>> hubDetails) {
     return Container(
       decoration: _explorePanelDecoration(context),
       margin: _explorePanelMargins,
@@ -185,9 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: <Widget>[
           _explorePanelDrawerIndicator,
           _explorePanelPaddingBox,
-          Consumer<HubProvider>(
-              builder: (context, hubDetails, child) =>
-                  _explorePanelHubDetails(hubDetails.hubs)),
+          _explorePanelHubDetails(hubDetails),
         ],
       )),
     );

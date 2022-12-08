@@ -16,7 +16,6 @@ class HubProvider extends ChangeNotifier {
   // Init the services and get all hubs
   HubProvider() {
     _hubServices = HubServices();
-    fetchAllHubs();
   }
 
   fetchAllHubs() async {
