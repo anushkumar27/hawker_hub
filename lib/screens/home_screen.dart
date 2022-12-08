@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hawker_hub/models/hub.dart';
+import 'package:hawker_hub/providers/hub_provider.dart';
 import 'package:hawker_hub/screens/search_screen.dart';
 import 'package:hawker_hub/screens/contribute_screen.dart';
+import 'package:hawker_hub/services/api_response.dart';
 import 'package:hawker_hub/widgets/hub_details_horizontal_card.dart';
+import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 // TODO: Update hardcoded data to receive values from network call
@@ -52,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
+    Provider.of<HubProvider>(context, listen: false).fetchAllHubs();
     _currentContributeButtonHeight = _initialContributeButtonHeight;
   }
 
@@ -141,6 +146,35 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _explorePanelHubDetails(ApiResponse<List<Hub>> hubDetails) {
+    switch (hubDetails.requestStatus) {
+      case RequestStatus.loading:
+        return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text("Fetching Data"),
+              SizedBox(width: 20),
+              CircularProgressIndicator()
+            ]);
+      case RequestStatus.completed:
+        List<Hub> hubList = hubDetails.data;
+        return Column(
+          children: hubList
+              .map((hubDetails) =>
+                  HubDetailsHorizontalCard(hubDetails: hubDetails))
+              .toList(),
+        );
+      case RequestStatus.error:
+        return Center(
+          child: Text(hubDetails.statusMessage),
+        );
+      default:
+        return const Center(
+          child: Text('There are no Hubs in the area'),
+        );
+    }
+  }
+
   Widget _explorePanelBody(BuildContext context) {
     return Container(
       decoration: _explorePanelDecoration(context),
@@ -151,7 +185,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: <Widget>[
           _explorePanelDrawerIndicator,
           _explorePanelPaddingBox,
-          for (int i = 0; i < 6; i++) ...[const HubDetailsHorizontalCard()],
+          Consumer<HubProvider>(
+              builder: (context, hubDetails, child) =>
+                  _explorePanelHubDetails(hubDetails.hubs)),
         ],
       )),
     );

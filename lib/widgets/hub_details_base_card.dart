@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 abstract class HubDetailsBaseCard extends StatelessWidget {
   const HubDetailsBaseCard({super.key});
 
-  Widget hubRating(BuildContext context) => Container(
+  Widget hubRating(BuildContext context, double rating) => Container(
       margin: const EdgeInsets.only(right: 20),
       height: 50,
       width: 50,
@@ -12,22 +12,23 @@ abstract class HubDetailsBaseCard extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: Center(
-          child: Text("4.1",
+          child: Text(rating.toString(),
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontStyle: Theme.of(context).textTheme.labelLarge?.fontStyle,
                   color: Colors.white))));
 
-  Widget hubTitle(BuildContext context) => Expanded(
+  Widget hubTitle(BuildContext context, String title, String category) =>
+      Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "La Raquita",
+              title,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             Text(
-              "Food | Open Now",
+              category,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
