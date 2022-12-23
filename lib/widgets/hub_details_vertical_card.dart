@@ -28,8 +28,8 @@ class HubDetailsVerticalCard extends HubDetailsBaseCard {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            hubRating(context),
-            hubTitle(context),
+            hubRating(context, 3.5),
+            hubTitle(context, "Change It", "Change It"),
             Icon(Icons.thumb_up_alt_outlined, color: Colors.grey[500]),
           ],
         ),

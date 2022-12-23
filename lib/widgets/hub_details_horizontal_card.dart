@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:hawker_hub/models/hub.dart';
 import 'package:hawker_hub/utilities/constants.dart';
 import 'package:hawker_hub/widgets/hub_details_base_card.dart';
 
 // TODO: Update hardcoded data to receive values from network call
 class HubDetailsHorizontalCard extends HubDetailsBaseCard {
-  const HubDetailsHorizontalCard({super.key});
+  const HubDetailsHorizontalCard({super.key, required this.hubDetails});
 
-  Widget _hubTimings(BuildContext context) => Column(
+  final Hub hubDetails;
+
+  Widget _hubTimings(BuildContext context, String startTime, String endTime) =>
+      Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
-            "10:00 AM",
+            startTime,
             style: TextStyle(
               color: Colors.grey[500],
             ),
@@ -22,7 +26,7 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
             ),
           ),
           Text(
-            "12:00 PM",
+            endTime,
             style: TextStyle(
               color: Colors.grey[500],
             ),
@@ -32,15 +36,17 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Take care of multiple locations
     return Card(
         shape: DesignConstants.hubDetailsCardShape(context),
         child: Container(
           padding: const EdgeInsets.all(20),
           child: Row(
             children: [
-              hubRating(context),
-              hubTitle(context),
-              _hubTimings(context)
+              hubRating(context, hubDetails.hubRating),
+              hubTitle(context, hubDetails.hubName, hubDetails.hubCategory),
+              _hubTimings(context, hubDetails.hubLocations[0].hubStartTime,
+                  hubDetails.hubLocations[0].hubEndTime)
             ],
           ),
         ));
