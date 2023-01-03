@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 abstract class HubDetailsBaseCard extends StatelessWidget {
   const HubDetailsBaseCard({super.key});
 
+  final heightSpacer = const SizedBox(height: 10);
+
   Widget hubRating(BuildContext context, double rating) => Container(
       margin: const EdgeInsets.only(right: 20),
       height: 50,
@@ -34,4 +36,18 @@ abstract class HubDetailsBaseCard extends StatelessWidget {
           ],
         ),
       );
+
+  // TODO: Add Open Status
+  Widget hubAddress(BuildContext context, String address) => Expanded(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            address,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          ElevatedButton(
+              onPressed: () => {}, child: const Text("Get Direction"))
+        ],
+      ));
 }

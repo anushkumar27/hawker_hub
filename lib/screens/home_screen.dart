@@ -9,7 +9,6 @@ import 'package:hawker_hub/widgets/hub_details_horizontal_card.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-// TODO: Update hardcoded data to receive values from network call
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -93,6 +92,8 @@ class _HomeScreenState extends State<HomeScreen> {
         collapsed: _explorePanelCollapsed(context),
         body: GoogleMap(
           onMapCreated: _onMapCreated,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: true,
           initialCameraPosition: CameraPosition(
             target: _center,
             zoom: 11.0,
@@ -172,6 +173,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  List<HubDetailsHorizontalCard> getHubDetailsHorizontalCardList(
+      List<Hub> hubList) {
+    List<HubDetailsHorizontalCard> hubDetailsHorizontalCardList = [];
+    for (Hub hub in hubList) {
+      for (HubLocation hubLocation in hub.hubLocations) {
+        hubDetailsHorizontalCardList.add(HubDetailsHorizontalCard(
+          hubDetails: hub,
+          hubLocationIndex: hub.hubLocations.indexOf(hubLocation),
+          mapController: mapController,
+        ));
+      }
+    }
+
+    return hubDetailsHorizontalCardList;
+  }
+
   Widget _explorePanelHubDetails(ApiResponse<List<Hub>> hubDetails) {
     switch (hubDetails.requestStatus) {
       case RequestStatus.loading:
@@ -184,12 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ]);
       case RequestStatus.completed:
         List<Hub> hubList = hubDetails.data;
-        return Column(
-          children: hubList
-              .map((hubDetails) =>
-                  HubDetailsHorizontalCard(hubDetails: hubDetails))
-              .toList(),
-        );
+        return Column(children: getHubDetailsHorizontalCardList(hubList));
       case RequestStatus.error:
         return Center(
           child: Text(hubDetails.statusMessage),
