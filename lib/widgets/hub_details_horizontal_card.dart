@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hawker_hub/models/hub.dart';
+import 'package:hawker_hub/screens/search_screen.dart';
 import 'package:hawker_hub/utilities/constants.dart';
 import 'package:hawker_hub/widgets/hub_details_base_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// TODO: Update hardcoded data to receive values from network call
 class HubDetailsHorizontalCard extends HubDetailsBaseCard {
   const HubDetailsHorizontalCard(
       {super.key,
       required this.hubDetails,
-      required this.hubLocationIndex,
+      required this.hubLocationArrayIndex,
       this.mapController});
 
   final Hub hubDetails;
-  final int hubLocationIndex;
+  final int hubLocationArrayIndex;
   final GoogleMapController? mapController;
 
   Widget _hubTimings(BuildContext context, String startTime, String endTime) =>
@@ -43,11 +43,10 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
       );
 
   moveToHubMarker() {
-    print("onTapping");
     mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
             target: LatLng(
-                hubDetails.hubLocations[hubLocationIndex].hubLatitude,
-                hubDetails.hubLocations[hubLocationIndex].hubLogitude),
+                hubDetails.hubLocations[hubLocationArrayIndex].hubLatitude,
+                hubDetails.hubLocations[hubLocationArrayIndex].hubLogitude),
             zoom: 15)
         //17 is new zoom level
         ));
@@ -55,7 +54,7 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
 
   Future<void> _launchDirectionToHub() async {
     final String googleMapslocationUrl =
-        "https://www.google.com/maps/search/?api=1&query=${hubDetails.hubLocations[hubLocationIndex].hubLatitude},${hubDetails.hubLocations[hubLocationIndex].hubLogitude}";
+        "https://www.google.com/maps/search/?api=1&query=${hubDetails.hubLocations[hubLocationArrayIndex].hubLatitude},${hubDetails.hubLocations[hubLocationArrayIndex].hubLogitude}";
 
     final Uri encodedURI = Uri.parse(googleMapslocationUrl);
     if (!await launchUrl(encodedURI)) {
@@ -83,13 +82,15 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
                     ),
                     _hubTimings(
                         context,
-                        hubDetails.hubLocations[hubLocationIndex].hubStartTime,
-                        hubDetails.hubLocations[hubLocationIndex].hubEndTime),
+                        hubDetails
+                            .hubLocations[hubLocationArrayIndex].hubStartTime,
+                        hubDetails
+                            .hubLocations[hubLocationArrayIndex].hubEndTime),
                   ],
                 ),
                 heightSpacer,
                 Text(
-                  hubDetails.hubLocations[hubLocationIndex].hubAddress,
+                  hubDetails.hubLocations[hubLocationArrayIndex].hubAddress,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 heightSpacer,
@@ -97,7 +98,12 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     OutlinedButton(
-                        onPressed: () => {},
+                        onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SearchScreen(
+                                      selectedHubName: hubDetails.hubName)),
+                            ),
                         child: const Text("More Information")),
                     ElevatedButton(
                         onPressed: _launchDirectionToHub,

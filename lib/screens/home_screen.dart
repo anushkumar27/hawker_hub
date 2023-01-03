@@ -124,7 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
             autofocus: false,
             onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SearchScreen()),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const SearchScreen(selectedHubName: "")),
                 ),
             decoration: const InputDecoration(
               hintText: "Name, Category, Food trucks..",
@@ -180,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
       for (HubLocation hubLocation in hub.hubLocations) {
         hubDetailsHorizontalCardList.add(HubDetailsHorizontalCard(
           hubDetails: hub,
-          hubLocationIndex: hub.hubLocations.indexOf(hubLocation),
+          hubLocationArrayIndex: hub.hubLocations.indexOf(hubLocation),
           mapController: mapController,
         ));
       }
