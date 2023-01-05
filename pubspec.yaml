@@ -47,6 +47,8 @@ dependencies:
   form_builder_extra_fields: ^8.3.0
   provider: ^6.0.4
   http: ^0.13.5
+  url_launcher: ^6.1.7
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
