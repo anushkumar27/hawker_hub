@@ -11,11 +11,26 @@ class HubProvider extends ChangeNotifier {
   // Hubs Data
   late ApiResponse<List<Hub>> _hubs;
 
+  // Selected Hub
+  String? _selectedHubId;
+  // Selected Hub Location Array Index
+  int? _selectedHubLocationArrayIndex;
+
+  String? get selectedHubId => _selectedHubId;
+  int? get selectedHubLocationArrayIndex => _selectedHubLocationArrayIndex;
+
   ApiResponse<List<Hub>> get hubs => _hubs;
 
   // Init the services and get all hubs
   HubProvider() {
     _hubServices = HubServices();
+  }
+
+  setSelectedHubIdAndLocationArrayIndex(
+      String hubId, int hubLocationArrayIndex) {
+    _selectedHubId = hubId;
+    _selectedHubLocationArrayIndex = hubLocationArrayIndex;
+    notifyListeners();
   }
 
   fetchAllHubs() async {

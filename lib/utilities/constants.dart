@@ -13,4 +13,11 @@ class DesignConstants {
         ),
         borderRadius: const BorderRadius.all(Radius.circular(12)),
       );
+
+  static hubDetailsSelectedCardShape(BuildContext context) =>
+      RoundedRectangleBorder(
+        side:
+            BorderSide(color: Theme.of(context).colorScheme.primary, width: 3),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
+      );
 }

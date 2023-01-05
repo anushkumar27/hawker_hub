@@ -114,6 +114,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     padding: const EdgeInsets.all(20),
                     child: SingleChildScrollView(
                       child: Column(children: [
+                        heightSpacer,
                         _searchTextFieldContainer(context),
                         heightSpacer,
                         Consumer<HubProvider>(
