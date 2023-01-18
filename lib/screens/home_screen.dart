@@ -41,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double _maxExplorePanelHeight = 0;
   late GoogleMapController mapController;
 
+  // TODO: Move map to user's current location
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }

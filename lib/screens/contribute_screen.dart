@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_image_picker/form_builder_image_picker.dart';
+import 'package:hawker_hub/screens/hub_location_picker_screen.dart';
 import 'package:hawker_hub/utilities/constants.dart';
 
 class ContributeScreen extends StatefulWidget {
@@ -27,6 +28,8 @@ class _ContributeScreenState extends State<ContributeScreen> {
   void _onChanged(dynamic val) => debugPrint(val.toString());
 
   final heightSpacer = const SizedBox(height: 15);
+  final List<Widget> _additonalLocationsArray = <Widget>[];
+  int _additionalLocationsCount = 0;
 
   hubRatingBar(context) => FormBuilderRatingBar(
         decoration: const InputDecoration(labelText: 'Hub Rating'),
@@ -42,16 +45,13 @@ class _ContributeScreenState extends State<ContributeScreen> {
       );
 
   hubImagePicker(context) => FormBuilderImagePicker(
-        name: 'Hub Photo',
+        name: 'hub_photo',
         decoration: const InputDecoration(
           labelText: 'Hub Photo',
         ),
         showDecoration: true,
         maxImages: 1,
         previewAutoSizeWidth: true,
-        initialValue: const [
-          'https://images.pexels.com/photos/7078045/pexels-photo-7078045.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-        ],
       );
 
   hubNameTextField(context) => FormBuilderTextField(
@@ -176,9 +176,9 @@ class _ContributeScreenState extends State<ContributeScreen> {
         textInputAction: TextInputAction.next,
       );
 
-  hubAddressTextField(context) => FormBuilderTextField(
+  hubAddressTextField(context, locationIndex) => FormBuilderTextField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        name: 'hub_address',
+        name: 'hub_address_$locationIndex',
         decoration: InputDecoration(
             hintText: "Hub Address",
             filled: true,
@@ -206,9 +206,33 @@ class _ContributeScreenState extends State<ContributeScreen> {
         textInputAction: TextInputAction.next,
       );
 
-  hubPhoneNumberTextField(context) => FormBuilderTextField(
+  hubAddressLatitude(context, locationIndex) => FormBuilderField(
+        name: 'hub_address_lat_$locationIndex',
+        enabled: false,
+        validator: FormBuilderValidators.compose([
+          FormBuilderValidators.required(),
+        ]),
+        builder: (FormFieldState<dynamic> field) {
+          //Empty widget
+          return const SizedBox.shrink();
+        },
+      );
+
+  hubAddressLongitude(context, locationIndex) => FormBuilderField(
+        name: 'hub_address_long_$locationIndex',
+        enabled: false,
+        validator: FormBuilderValidators.compose([
+          FormBuilderValidators.required(),
+        ]),
+        builder: (FormFieldState<dynamic> field) {
+          //Empty widget
+          return const SizedBox.shrink();
+        },
+      );
+
+  hubPhoneNumberTextField(context, locationIndex) => FormBuilderTextField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        name: 'hub_phone_number',
+        name: 'hub_phone_number_$locationIndex',
         decoration: InputDecoration(
             hintText: "Hub Phone Number",
             filled: true,
@@ -237,10 +261,11 @@ class _ContributeScreenState extends State<ContributeScreen> {
         textInputAction: TextInputAction.next,
       );
 
-  hubDaysOfOperationCheckBox(context) => FormBuilderCheckboxGroup<String>(
+  hubDaysOfOperationCheckBox(context, locationIndex) =>
+      FormBuilderCheckboxGroup<String>(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: const InputDecoration(labelText: 'Days of Operation'),
-        name: 'hub_days_of_operation',
+        name: 'hub_days_of_operation_$locationIndex',
         // initialValue: const ['Dart'],
         options: const [
           FormBuilderFieldOption(value: 'Monday'),
@@ -262,8 +287,8 @@ class _ContributeScreenState extends State<ContributeScreen> {
         ]),
       );
 
-  hubStartTimePicker(context) => FormBuilderDateTimePicker(
-        name: 'hub_start_time',
+  hubStartTimePicker(context, locationIndex) => FormBuilderDateTimePicker(
+        name: 'hub_start_time_$locationIndex',
         inputType: InputType.time,
         initialTime: const TimeOfDay(hour: 8, minute: 0),
         timePickerInitialEntryMode: TimePickerEntryMode.dial,
@@ -283,8 +308,8 @@ class _ContributeScreenState extends State<ContributeScreen> {
             )),
       );
 
-  hubEndTimePicker(context) => FormBuilderDateTimePicker(
-        name: 'hub_end_time',
+  hubEndTimePicker(context, locationIndex) => FormBuilderDateTimePicker(
+        name: 'hub_end_time_$locationIndex',
         inputType: InputType.time,
         initialTime: const TimeOfDay(hour: 20, minute: 0),
         timePickerInitialEntryMode: TimePickerEntryMode.dial,
@@ -304,15 +329,25 @@ class _ContributeScreenState extends State<ContributeScreen> {
             )),
       );
 
-  final hubAddLocationButton = ElevatedButton(
-    style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xff6750a4),
-        foregroundColor: Colors.white),
-    onPressed: () {},
-    child: const Text(
-      'Add Location',
-    ),
-  );
+  hubRemoveAllLocationsButton() {
+    if (_additionalLocationsCount > 0) {
+      return OutlinedButton(
+        style: OutlinedButton.styleFrom(
+            backgroundColor: const Color(0xff6750a4),
+            foregroundColor: Colors.white),
+        onPressed: () {
+          setState(() {
+            _additionalLocationsCount = 0;
+            _additonalLocationsArray.clear();
+          });
+        },
+        child: const Text(
+          'Remove All Locations',
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
 
   submitButton(context) => Expanded(
         child: ElevatedButton(
@@ -351,6 +386,78 @@ class _ContributeScreenState extends State<ContributeScreen> {
         ),
       );
 
+  hubAddressMapPicker(context, locationIndex) {
+    return OutlinedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HubLocationPickerScreen(
+                hubLocationIndex: locationIndex,
+                setHubAddressAndGeoLocationCallback:
+                    setHubAddressAndGeoLocation),
+          ),
+        );
+      },
+      child: const Text(
+        'Pick Address on the Map',
+      ),
+    );
+  }
+
+  setHubAddressAndGeoLocation(int hubLocationIndex, String hubAddress,
+      dynamic latitude, dynamic longitude) {
+    _formKey.currentState!.fields['hub_address_$hubLocationIndex']
+        ?.didChange(hubAddress);
+    _formKey.currentState!.fields['hub_address_lat_$hubLocationIndex']
+        ?.didChange(latitude);
+    _formKey.currentState!.fields['hub_address_long_$hubLocationIndex']
+        ?.didChange(longitude);
+  }
+
+  getHubLocationFields(context, locationIndex) {
+    return <Widget>[
+      heightSpacer,
+      hubAddressTextField(context, locationIndex),
+      hubAddressLatitude(context, locationIndex),
+      hubAddressLongitude(context, locationIndex),
+      hubAddressMapPicker(context, locationIndex),
+      heightSpacer,
+      hubPhoneNumberTextField(context, locationIndex),
+      hubDaysOfOperationCheckBox(context, locationIndex),
+      heightSpacer,
+      hubStartTimePicker(context, locationIndex),
+      heightSpacer,
+      hubEndTimePicker(context, locationIndex),
+      heightSpacer
+    ];
+  }
+
+  _addAdditionalAddressButton(BuildContext context) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xff6750a4),
+          foregroundColor: Colors.white),
+      onPressed: () {
+        setState(() {
+          // Create a new location field
+          List<Widget> hubLocationFields =
+              getHubLocationFields(context, _additionalLocationsCount++);
+          _additonalLocationsArray
+              .add(Text("Additional Location : $_additionalLocationsCount"));
+          _additonalLocationsArray.add(heightSpacer);
+          for (Widget widget in hubLocationFields) {
+            _additonalLocationsArray.add(widget);
+          }
+          _additonalLocationsArray.add(heightSpacer);
+        });
+      },
+      child: const Text(
+        'Add Location',
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -386,20 +493,12 @@ class _ContributeScreenState extends State<ContributeScreen> {
                       heightSpacer,
                       hubCategoryDropdown(context),
                       heightSpacer,
-                      hubCategoryDropdown(context),
-                      heightSpacer,
                       const Text("Locations"),
+                      ...getHubLocationFields(context, 0),
+                      _addAdditionalAddressButton(context),
                       heightSpacer,
-                      hubAddressTextField(context),
-                      heightSpacer,
-                      hubPhoneNumberTextField(context),
-                      hubDaysOfOperationCheckBox(context),
-                      heightSpacer,
-                      hubStartTimePicker(context),
-                      heightSpacer,
-                      hubEndTimePicker(context),
-                      heightSpacer,
-                      hubAddLocationButton
+                      ..._additonalLocationsArray,
+                      hubRemoveAllLocationsButton(),
                     ],
                   ),
                 ),
