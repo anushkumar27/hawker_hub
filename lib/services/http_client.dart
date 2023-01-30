@@ -6,6 +6,9 @@ import 'package:hawker_hub/services/api_base.dart';
 import 'package:hawker_hub/services/api_exceptions.dart';
 import 'package:hawker_hub/utilities/constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart' as path;
+import 'package:image_picker/image_picker.dart';
 
 /// HTTP Client
 /// Singleton helper class for making HTTPS REST API calls
@@ -53,6 +56,36 @@ class HttpClient {
       final response = await http
           .post(Uri.parse(APIBase.baseURL + url), body: body, headers: header)
           .timeout(Constants.clientNetworkTimeout);
+      responseJson = _returnResponse(response);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    } on TimeoutException {
+      throw ClientTimeoutException(
+          "${Constants.clientNetworkTimeout.inSeconds} seconds");
+    }
+    return responseJson;
+  }
+
+  Future<dynamic> postDataAndImage(dynamic body, XFile image) async {
+    var url = APIBase.baseURL;
+    dynamic responseJson;
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+
+      request.headers['Content-Type'] = 'application/json';
+      request.fields['hubDetails'] = jsonEncode(body);
+
+      var multipartFile = http.MultipartFile.fromBytes(
+        'hubPhoto',
+        await image.readAsBytes(),
+        filename: image.name,
+        contentType: MediaType("image", path.extension(image.path)),
+      );
+
+      request.files.add(multipartFile);
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
       responseJson = _returnResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');

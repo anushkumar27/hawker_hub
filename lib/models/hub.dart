@@ -7,7 +7,7 @@ class Hub {
   String hubName;
   String hubDescription;
   String hubCategory;
-  int hubCostForTwo;
+  String hubCostForTwo;
   List<HubLocation> hubLocations;
 
   Hub(
@@ -38,13 +38,26 @@ class Hub {
         hubCostForTwo: json['hub_cost_for_two'],
         hubLocations: hubLocations);
   }
+
+  Map<String, dynamic> toJson() => {
+        "hub_id": hubId,
+        "hub_rating": hubRating,
+        "hub_photo": hubPhoto,
+        "hub_name": hubName,
+        "hub_description": hubDescription,
+        "hub_category": hubCategory,
+        "hub_cost_for_two": hubCostForTwo,
+        "hub_locations": hubLocations
+            .map((hubLocation) => hubLocation.toJson())
+            .toList(growable: false)
+      };
 }
 
 class HubLocation {
   String hubAddress;
   double hubLatitude;
-  double hubLogitude;
-  int hubPhoneNumber;
+  double hubLongitude;
+  String hubPhoneNumber;
   List<String> hubDaysOfOperation;
   String hubStartTime;
   String hubEndTime;
@@ -52,7 +65,7 @@ class HubLocation {
   HubLocation(
       {required this.hubAddress,
       required this.hubLatitude,
-      required this.hubLogitude,
+      required this.hubLongitude,
       required this.hubPhoneNumber,
       required this.hubDaysOfOperation,
       required this.hubStartTime,
@@ -62,10 +75,22 @@ class HubLocation {
     return HubLocation(
         hubAddress: json['hub_address'],
         hubLatitude: json['hub_latitude'],
-        hubLogitude: json['hub_logitude'],
+        hubLongitude: json['hub_longitude'],
         hubPhoneNumber: json['hub_phone_number'],
         hubDaysOfOperation: json['hub_days_of_operation'].cast<String>(),
         hubStartTime: json['hub_start_time'],
         hubEndTime: json['hub_end_time']);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "hub_days_of_operation": hubDaysOfOperation,
+      "hub_start_time": hubStartTime,
+      "hub_phone_number": hubPhoneNumber,
+      "hub_longitude": hubLongitude,
+      "hub_latitude": hubLatitude,
+      "hub_address": hubAddress,
+      "hub_end_time": hubEndTime
+    };
   }
 }

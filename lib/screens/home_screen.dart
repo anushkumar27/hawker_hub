@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Index is appended as one hub can have multiple locations
               markerId: MarkerId(hub.hubId + index.toString()),
               position:
-                  LatLng(hubLocation.hubLatitude, hubLocation.hubLogitude),
+                  LatLng(hubLocation.hubLatitude, hubLocation.hubLongitude),
               infoWindow: InfoWindow(
                 title: "${hub.hubName} (${hub.hubRating})",
                 snippet: hubLocation.hubAddress,

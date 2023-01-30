@@ -22,7 +22,7 @@ class HubDetailsVerticalCard extends HubDetailsBaseCard {
 
   Future<void> _launchDirectionToHub() async {
     final String googleMapslocationUrl =
-        "https://www.google.com/maps/search/?api=1&query=${hubDetails.hubLocations[hubLocationArrayIndex].hubLatitude},${hubDetails.hubLocations[hubLocationArrayIndex].hubLogitude}";
+        "https://www.google.com/maps/search/?api=1&query=${hubDetails.hubLocations[hubLocationArrayIndex].hubLatitude},${hubDetails.hubLocations[hubLocationArrayIndex].hubLongitude}";
 
     final Uri encodedURI = Uri.parse(googleMapslocationUrl);
     if (!await launchUrl(encodedURI)) {

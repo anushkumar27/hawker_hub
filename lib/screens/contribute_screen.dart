@@ -3,8 +3,13 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_image_picker/form_builder_image_picker.dart';
+import 'package:hawker_hub/models/hub.dart';
+import 'package:hawker_hub/providers/hub_provider.dart';
 import 'package:hawker_hub/screens/hub_location_picker_screen.dart';
 import 'package:hawker_hub/utilities/constants.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class ContributeScreen extends StatefulWidget {
   const ContributeScreen({super.key});
@@ -30,6 +35,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
   final heightSpacer = const SizedBox(height: 15);
   final List<Widget> _additonalLocationsArray = <Widget>[];
   int _additionalLocationsCount = 0;
+  var uuidGenerator = const Uuid();
 
   hubRatingBar(context) => FormBuilderRatingBar(
         decoration: const InputDecoration(labelText: 'Hub Rating'),
@@ -52,6 +58,8 @@ class _ContributeScreenState extends State<ContributeScreen> {
         showDecoration: true,
         maxImages: 1,
         previewAutoSizeWidth: true,
+        validator:
+            FormBuilderValidators.compose([FormBuilderValidators.required()]),
       );
 
   hubNameTextField(context) => FormBuilderTextField(
@@ -147,7 +155,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
 
   hubCostTextField(context) => FormBuilderTextField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        name: 'hub_cost',
+        name: 'hub_cost_for_two',
         decoration: InputDecoration(
             hintText: "Cost for two (USD)",
             filled: true,
@@ -355,15 +363,48 @@ class _ContributeScreenState extends State<ContributeScreen> {
               backgroundColor: const Color(0xff6750a4),
               foregroundColor: Colors.white),
           onPressed: () {
-            debugPrint(_hubAddressHasError.toString());
-            debugPrint(_hubCategoryOptions.toString());
-            debugPrint(_hubCategoryOptionsHasError.toString());
-            debugPrint(_hubCostHasError.toString());
-            debugPrint(_hubNameHasError.toString());
-            debugPrint(_hubPhoneNumberHasError.toString());
-            debugPrint(_hubDescriptionHasError.toString());
             if (_formKey.currentState?.saveAndValidate() ?? false) {
               debugPrint(_formKey.currentState?.value.toString());
+              String? hubStartTime = _formKey
+                  .currentState?.fields['hub_start_time_0']?.value
+                  .toString();
+              String? hubEndTime = _formKey
+                  .currentState?.fields['hub_end_time_0']?.value
+                  .toString();
+
+              HubLocation newHubLocationDetails = HubLocation(
+                  hubAddress:
+                      _formKey.currentState?.fields['hub_address_0']?.value,
+                  hubLatitude:
+                      _formKey.currentState?.fields['hub_address_lat_0']?.value,
+                  hubLongitude: _formKey
+                      .currentState?.fields['hub_address_long_0']?.value,
+                  hubPhoneNumber: _formKey
+                      .currentState?.fields['hub_phone_number_0']?.value,
+                  hubDaysOfOperation: _formKey
+                      .currentState?.fields['hub_days_of_operation_0']?.value,
+                  hubStartTime: hubStartTime!,
+                  hubEndTime: hubEndTime!);
+
+              Hub newHubDetails = Hub(
+                  hubId: uuidGenerator.v4(),
+                  hubCategory:
+                      _formKey.currentState?.fields['hub_category']?.value,
+                  hubRating: _formKey.currentState?.fields['hub_rating']?.value,
+                  hubCostForTwo:
+                      _formKey.currentState?.fields['hub_cost_for_two']?.value,
+                  hubDescription:
+                      _formKey.currentState?.fields['hub_description']?.value,
+                  hubName: _formKey.currentState?.fields['hub_name']?.value,
+                  hubLocations: [newHubLocationDetails],
+                  hubPhoto: 's3_url');
+
+              XFile hubPhoto =
+                  _formKey.currentState?.fields['hub_photo']?.value[0];
+
+              // Insert hub
+              Provider.of<HubProvider>(context, listen: false)
+                  .insertHub(newHubDetails, hubPhoto);
             } else {
               debugPrint(_formKey.currentState?.value.toString());
               debugPrint('validation failed');
@@ -492,6 +533,8 @@ class _ContributeScreenState extends State<ContributeScreen> {
                       hubDescriptionTextField(context),
                       heightSpacer,
                       hubCategoryDropdown(context),
+                      heightSpacer,
+                      hubCostTextField(context),
                       heightSpacer,
                       const Text("Locations"),
                       ...getHubLocationFields(context, 0),
