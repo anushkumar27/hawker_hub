@@ -26,7 +26,8 @@ class _ContributeScreenState extends State<ContributeScreen> {
   final _hubCategoryOptions = ['Food', 'Vegetables', 'Flowers', 'Other'];
   final heightSpacer = const SizedBox(height: 15);
   final List<Widget> _additonalLocationsArray = <Widget>[];
-  int _additionalLocationsCount = 0;
+  // Index 0 is mandatory and hence starting additional locations count from 1
+  int _additionalLocationsCount = 1;
   var uuidGenerator = const Uuid();
 
   hubRatingBar(context) => FormBuilderRatingBar(
@@ -286,14 +287,14 @@ class _ContributeScreenState extends State<ContributeScreen> {
           )));
 
   hubRemoveAllLocationsButton() {
-    if (_additionalLocationsCount > 0) {
+    if (_additionalLocationsCount > 1) {
       return OutlinedButton(
         style: OutlinedButton.styleFrom(
             backgroundColor: const Color(0xff6750a4),
             foregroundColor: Colors.white),
         onPressed: () {
           setState(() {
-            _additionalLocationsCount = 0;
+            _additionalLocationsCount = 1;
             _additonalLocationsArray.clear();
           });
         },
@@ -313,30 +314,39 @@ class _ContributeScreenState extends State<ContributeScreen> {
           onPressed: () {
             if (_formKey.currentState?.saveAndValidate() ?? false) {
               debugPrint(_formKey.currentState?.value.toString());
-              String? hubStartTime = _formKey
-                  .currentState?.fields['hub_start_time_0']?.value
-                  .toString()
-                  .split(" ")[1]
-                  .substring(0, 5);
-              String? hubEndTime = _formKey
-                  .currentState?.fields['hub_end_time_0']?.value
-                  .toString()
-                  .split(" ")[1]
-                  .substring(0, 5);
 
-              HubLocation newHubLocationDetails = HubLocation(
-                  hubAddress:
-                      _formKey.currentState?.fields['hub_address_0']?.value,
-                  hubLatitude:
-                      _formKey.currentState?.fields['hub_address_lat_0']?.value,
-                  hubLongitude: _formKey
-                      .currentState?.fields['hub_address_long_0']?.value,
-                  hubPhoneNumber: _formKey
-                      .currentState?.fields['hub_phone_number_0']?.value,
-                  hubDaysOfOperation: _formKey
-                      .currentState?.fields['hub_days_of_operation_0']?.value,
-                  hubStartTime: hubStartTime!,
-                  hubEndTime: hubEndTime!);
+              List<HubLocation> newHubLocations = [];
+
+              for (int currIndex = 0;
+                  currIndex < _additionalLocationsCount;
+                  currIndex++) {
+                String? hubStartTime = _formKey
+                    .currentState?.fields['hub_start_time_$currIndex']?.value
+                    .toString()
+                    .split(" ")[1]
+                    .substring(0, 5);
+                String? hubEndTime = _formKey
+                    .currentState?.fields['hub_end_time_$currIndex']?.value
+                    .toString()
+                    .split(" ")[1]
+                    .substring(0, 5);
+
+                HubLocation newHubLocationDetails = HubLocation(
+                    hubAddress: _formKey
+                        .currentState?.fields['hub_address_$currIndex']?.value,
+                    hubLatitude: _formKey.currentState
+                        ?.fields['hub_address_lat_$currIndex']?.value,
+                    hubLongitude: _formKey.currentState
+                        ?.fields['hub_address_long_$currIndex']?.value,
+                    hubPhoneNumber: _formKey.currentState
+                        ?.fields['hub_phone_number_$currIndex']?.value,
+                    hubDaysOfOperation: _formKey.currentState
+                        ?.fields['hub_days_of_operation_$currIndex']?.value,
+                    hubStartTime: hubStartTime!,
+                    hubEndTime: hubEndTime!);
+
+                newHubLocations.add(newHubLocationDetails);
+              }
 
               Hub newHubDetails = Hub(
                   hubId: uuidGenerator.v4(),
@@ -349,9 +359,10 @@ class _ContributeScreenState extends State<ContributeScreen> {
                   hubDescription:
                       _formKey.currentState?.fields['hub_description']?.value,
                   hubName: _formKey.currentState?.fields['hub_name']?.value,
-                  hubLocations: [newHubLocationDetails],
+                  hubLocations: newHubLocations,
                   hubPhoto: 's3_url');
 
+              // Only one image
               XFile hubPhoto =
                   _formKey.currentState?.fields['hub_photo']?.value[0];
 
@@ -436,7 +447,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         setState(() {
           // Create a new location field
           List<Widget> hubLocationFields =
-              getHubLocationFields(context, _additionalLocationsCount++);
+              getHubLocationFields(context, _additionalLocationsCount);
           _additonalLocationsArray
               .add(Text("Additional Location : $_additionalLocationsCount"));
           _additonalLocationsArray.add(heightSpacer);
@@ -444,6 +455,8 @@ class _ContributeScreenState extends State<ContributeScreen> {
             _additonalLocationsArray.add(widget);
           }
           _additonalLocationsArray.add(heightSpacer);
+
+          _additionalLocationsCount++;
         });
       },
       child: const Text(
@@ -527,6 +540,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
+            SizedBox(height: 20),
             CircularProgressIndicator(),
             SizedBox(height: 20),
             Text("Thanks for your contribution. Adding the Hub..."),
@@ -539,6 +553,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
+            SizedBox(height: 20),
             Text("Hub added Sucessfully!"),
             SizedBox(height: 20),
             CircularProgressIndicator(),
@@ -550,6 +565,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 20),
             const Text('There was an error while adding Hub. Please re-submit'),
             const SizedBox(height: 20),
             Text(insertHubsResponse.statusMessage),

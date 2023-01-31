@@ -13,7 +13,7 @@ class HubProvider extends ChangeNotifier {
   late ApiResponse<List<Hub>> _hubs;
 
   // Insert Hubs Response
-  ApiResponse<dynamic>? _insertHubsResponse;
+  ApiResponse<Hub>? _insertHubsResponse;
 
   // Selected Hub
   String? _selectedHubId;
@@ -24,7 +24,7 @@ class HubProvider extends ChangeNotifier {
   int? get selectedHubLocationArrayIndex => _selectedHubLocationArrayIndex;
 
   ApiResponse<List<Hub>> get hubs => _hubs;
-  ApiResponse<dynamic>? get insertHubsResponse => _insertHubsResponse;
+  ApiResponse<Hub>? get insertHubsResponse => _insertHubsResponse;
 
   // Init the services and get all hubs
   HubProvider() {
@@ -55,8 +55,10 @@ class HubProvider extends ChangeNotifier {
     _insertHubsResponse = ApiResponse.loading('Inserting Data');
     notifyListeners();
     try {
-      dynamic response = await _hubServices.insertHub(hubDetails, hubPhoto);
-      _insertHubsResponse = ApiResponse.completed(response);
+      Hub hub = await _hubServices.insertHub(hubDetails, hubPhoto);
+      _insertHubsResponse = ApiResponse.completed(hub);
+      // Update the overall hub list
+      _hubs.data.add(hub);
       notifyListeners();
     } catch (exception) {
       _insertHubsResponse = ApiResponse.error(exception.toString());

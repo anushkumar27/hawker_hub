@@ -90,7 +90,7 @@ class _HubLocationPickerScreenState extends State<HubLocationPickerScreen> {
                     width: 25,
                   ),
                   title: Text(
-                    currentLocationAddress!,
+                    currentLocationAddress,
                     style: const TextStyle(fontSize: 12),
                   ),
                   dense: true,

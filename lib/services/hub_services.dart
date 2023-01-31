@@ -14,9 +14,9 @@ class HubServices {
     return hubs;
   }
 
-  Future<dynamic> insertHub(Hub hubDetails, XFile hubPhoto) async {
+  Future<Hub> insertHub(Hub hubDetails, XFile hubPhoto) async {
     final response =
         await HttpClient.instance.postDataAndImage(hubDetails, hubPhoto);
-    return response;
+    return Hub.fromJson(response);
   }
 }

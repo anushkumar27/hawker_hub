@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 
 /// APIBase
 /// Holds the base URL for the backend server
-// TODO: Update PROD URL
 class APIBase {
   static String get baseURL {
     if (kReleaseMode) {
