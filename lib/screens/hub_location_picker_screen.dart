@@ -90,7 +90,7 @@ class _HubLocationPickerScreenState extends State<HubLocationPickerScreen> {
                     width: 25,
                   ),
                   title: Text(
-                    currentLocationAddress,
+                    currentLocationAddress!,
                     style: const TextStyle(fontSize: 12),
                   ),
                   dense: true,
@@ -112,28 +112,49 @@ class _HubLocationPickerScreenState extends State<HubLocationPickerScreen> {
     return SafeArea(
         child: SizedBox.expand(
             child: Scaffold(
-                appBar: AppBar(
-                  title: const Center(child: Text("Contribute")),
-                  backgroundColor: Constants.primarySurfaceColor,
+      appBar: AppBar(
+        title: const Center(child: Text("Contribute")),
+        backgroundColor: Constants.primarySurfaceColor,
+      ),
+      body: Stack(children: [
+        GoogleMap(
+          myLocationButtonEnabled: true,
+          myLocationEnabled: true,
+          initialCameraPosition: CameraPosition(
+            target: _center,
+            zoom: 15.0,
+          ),
+          onMapCreated: _onMapCreated,
+          onCameraMove: (CameraPosition newCameraPosition) {
+            // When the Map is dragged
+            currentCameraPosition = newCameraPosition;
+          },
+          onCameraIdle: _onCameraIdle,
+        ),
+        // Picker Image at the centre
+        _pickerImage,
+        _addressDisplayCard(context)
+      ]),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          if (currentLocationAddress == "") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Error getting the address!'),
+                action: SnackBarAction(
+                  label: 'Retry',
+                  onPressed: _onCameraIdle,
                 ),
-                body: Stack(children: [
-                  GoogleMap(
-                    myLocationButtonEnabled: true,
-                    myLocationEnabled: true,
-                    initialCameraPosition: CameraPosition(
-                      target: _center,
-                      zoom: 15.0,
-                    ),
-                    onMapCreated: _onMapCreated,
-                    onCameraMove: (CameraPosition newCameraPosition) {
-                      // When the Map is dragged
-                      currentCameraPosition = newCameraPosition;
-                    },
-                    onCameraIdle: _onCameraIdle,
-                  ),
-                  // Picker Image at the centre
-                  _pickerImage,
-                  _addressDisplayCard(context)
-                ]))));
+              ),
+            );
+          } else {
+            Navigator.pop(context);
+          }
+        },
+        label: const Text('Done'),
+        icon: const Icon(Icons.done),
+      ),
+    )));
   }
 }

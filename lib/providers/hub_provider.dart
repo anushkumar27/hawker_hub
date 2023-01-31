@@ -13,7 +13,7 @@ class HubProvider extends ChangeNotifier {
   late ApiResponse<List<Hub>> _hubs;
 
   // Insert Hubs Response
-  late ApiResponse<dynamic> _insertHubsResponse;
+  ApiResponse<dynamic>? _insertHubsResponse;
 
   // Selected Hub
   String? _selectedHubId;
@@ -24,7 +24,7 @@ class HubProvider extends ChangeNotifier {
   int? get selectedHubLocationArrayIndex => _selectedHubLocationArrayIndex;
 
   ApiResponse<List<Hub>> get hubs => _hubs;
-  ApiResponse<dynamic> get insertHubsResponse => _insertHubsResponse;
+  ApiResponse<dynamic>? get insertHubsResponse => _insertHubsResponse;
 
   // Init the services and get all hubs
   HubProvider() {

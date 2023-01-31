@@ -49,7 +49,6 @@ class _SearchScreenState extends State<SearchScreen> {
       decoration: const InputDecoration(
         hintText: "Name, Category, Food trucks..",
         prefixIcon: Icon(Icons.search),
-        suffixIcon: Icon(Icons.cancel_outlined),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(),

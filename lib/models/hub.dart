@@ -30,7 +30,7 @@ class Hub {
 
     return Hub(
         hubId: json['hub_id'],
-        hubRating: json['hub_rating'],
+        hubRating: json['hub_rating'].toDouble(),
         hubPhoto: json['hub_photo'],
         hubName: json['hub_name'],
         hubDescription: json['hub_description'],

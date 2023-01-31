@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_phone_field/form_builder_phone_field.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_image_picker/form_builder_image_picker.dart';
 import 'package:hawker_hub/models/hub.dart';
 import 'package:hawker_hub/providers/hub_provider.dart';
 import 'package:hawker_hub/screens/hub_location_picker_screen.dart';
+import 'package:hawker_hub/services/api_response.dart';
 import 'package:hawker_hub/utilities/constants.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -22,16 +24,6 @@ class _ContributeScreenState extends State<ContributeScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
 
   final _hubCategoryOptions = ['Food', 'Vegetables', 'Flowers', 'Other'];
-
-  bool _hubNameHasError = false;
-  bool _hubDescriptionHasError = false;
-  bool _hubCategoryOptionsHasError = false;
-  bool _hubCostHasError = false;
-  bool _hubAddressHasError = false;
-  bool _hubPhoneNumberHasError = false;
-
-  void _onChanged(dynamic val) => debugPrint(val.toString());
-
   final heightSpacer = const SizedBox(height: 15);
   final List<Widget> _additonalLocationsArray = <Widget>[];
   int _additionalLocationsCount = 0;
@@ -45,7 +37,6 @@ class _ContributeScreenState extends State<ContributeScreen> {
         itemSize: 50.0,
         initialValue: 2.5,
         maxRating: 5.0,
-        onChanged: _onChanged,
         unratedColor: Theme.of(context).colorScheme.primary,
         glowColor: Theme.of(context).colorScheme.primary,
       );
@@ -78,16 +69,9 @@ class _ContributeScreenState extends State<ContributeScreen> {
                 _formKey.currentState!.fields['hub_name']?.reset();
               },
             )),
-        onChanged: (val) {
-          setState(() {
-            _hubNameHasError =
-                !(_formKey.currentState?.fields['hub_name']?.validate() ??
-                    false);
-          });
-        },
         validator: FormBuilderValidators.compose([
           FormBuilderValidators.required(),
-          FormBuilderValidators.max(70),
+          FormBuilderValidators.max(150),
         ]),
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
@@ -108,17 +92,9 @@ class _ContributeScreenState extends State<ContributeScreen> {
                 _formKey.currentState!.fields['hub_description']?.reset();
               },
             )),
-        onChanged: (val) {
-          setState(() {
-            _hubDescriptionHasError = !(_formKey
-                    .currentState?.fields['hub_description']
-                    ?.validate() ??
-                false);
-          });
-        },
         validator: FormBuilderValidators.compose([
           FormBuilderValidators.required(),
-          FormBuilderValidators.max(150),
+          FormBuilderValidators.max(300),
         ]),
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
@@ -143,13 +119,6 @@ class _ContributeScreenState extends State<ContributeScreen> {
                   child: Text(hubCategory),
                 ))
             .toList(),
-        onChanged: (val) {
-          setState(() {
-            _hubCategoryOptionsHasError =
-                !(_formKey.currentState?.fields['hub_category']?.validate() ??
-                    false);
-          });
-        },
         valueTransformer: (val) => val?.toString(),
       );
 
@@ -165,16 +134,9 @@ class _ContributeScreenState extends State<ContributeScreen> {
             suffixIcon: IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                _formKey.currentState!.fields['hub_cost']?.reset();
+                _formKey.currentState!.fields['hub_cost_for_two']?.reset();
               },
             )),
-        onChanged: (val) {
-          setState(() {
-            _hubCostHasError =
-                !(_formKey.currentState?.fields['hub_cost']?.validate() ??
-                    false);
-          });
-        },
         validator: FormBuilderValidators.compose([
           FormBuilderValidators.required(),
           FormBuilderValidators.numeric(),
@@ -186,9 +148,10 @@ class _ContributeScreenState extends State<ContributeScreen> {
 
   hubAddressTextField(context, locationIndex) => FormBuilderTextField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        readOnly: true,
         name: 'hub_address_$locationIndex',
         decoration: InputDecoration(
-            hintText: "Hub Address",
+            hintText: "Pick an address (Read-only)",
             filled: true,
             fillColor: Colors.white,
             border: const OutlineInputBorder(),
@@ -196,20 +159,12 @@ class _ContributeScreenState extends State<ContributeScreen> {
             suffixIcon: IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                _formKey.currentState!.fields['hub_address']?.reset();
+                _formKey.currentState!.fields['hub_address_$locationIndex']
+                    ?.reset();
               },
             )),
-        onChanged: (val) {
-          setState(() {
-            _hubAddressHasError =
-                !(_formKey.currentState?.fields['hub_address']?.validate() ??
-                    false);
-          });
-        },
-        validator: FormBuilderValidators.compose([
-          FormBuilderValidators.required(),
-          FormBuilderValidators.max(150),
-        ]),
+        validator:
+            FormBuilderValidators.compose([FormBuilderValidators.required()]),
         keyboardType: TextInputType.streetAddress,
         textInputAction: TextInputAction.next,
       );
@@ -238,7 +193,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         },
       );
 
-  hubPhoneNumberTextField(context, locationIndex) => FormBuilderTextField(
+  hubPhoneNumberTextField(context, locationIndex) => FormBuilderPhoneField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         name: 'hub_phone_number_$locationIndex',
         decoration: InputDecoration(
@@ -250,20 +205,14 @@ class _ContributeScreenState extends State<ContributeScreen> {
             suffixIcon: IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                _formKey.currentState!.fields['hub_phone_number']?.reset();
+                _formKey.currentState!.fields['hub_phone_number_$locationIndex']
+                    ?.reset();
               },
             )),
-        onChanged: (val) {
-          setState(() {
-            _hubPhoneNumberHasError = !(_formKey
-                    .currentState?.fields['hub_phone_number']
-                    ?.validate() ??
-                false);
-          });
-        },
+        priorityListByIsoCode: const ['US'],
         validator: FormBuilderValidators.compose([
+          FormBuilderValidators.numeric(),
           FormBuilderValidators.required(),
-          FormBuilderValidators.max(150),
         ]),
         keyboardType: TextInputType.phone,
         textInputAction: TextInputAction.next,
@@ -284,7 +233,6 @@ class _ContributeScreenState extends State<ContributeScreen> {
           FormBuilderFieldOption(value: 'Saturday'),
           FormBuilderFieldOption(value: 'Sunday'),
         ],
-        onChanged: _onChanged,
         separator: const VerticalDivider(
           width: 10,
           thickness: 5,
@@ -296,46 +244,46 @@ class _ContributeScreenState extends State<ContributeScreen> {
       );
 
   hubStartTimePicker(context, locationIndex) => FormBuilderDateTimePicker(
-        name: 'hub_start_time_$locationIndex',
-        inputType: InputType.time,
-        initialTime: const TimeOfDay(hour: 8, minute: 0),
-        timePickerInitialEntryMode: TimePickerEntryMode.dial,
-        validator:
-            FormBuilderValidators.compose([FormBuilderValidators.required()]),
-        decoration: InputDecoration(
-            hintText: "Start Time",
-            filled: true,
-            fillColor: Colors.white,
-            border: const OutlineInputBorder(),
-            labelText: 'Start Time',
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                _formKey.currentState!.fields['hub_start_time']?.reset();
-              },
-            )),
-      );
+      name: 'hub_start_time_$locationIndex',
+      inputType: InputType.time,
+      initialTime: const TimeOfDay(hour: 8, minute: 0),
+      timePickerInitialEntryMode: TimePickerEntryMode.dial,
+      validator:
+          FormBuilderValidators.compose([FormBuilderValidators.required()]),
+      decoration: InputDecoration(
+          hintText: "Start Time",
+          filled: true,
+          fillColor: Colors.white,
+          border: const OutlineInputBorder(),
+          labelText: 'Start Time',
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              _formKey.currentState!.fields['hub_start_time_$locationIndex']
+                  ?.reset();
+            },
+          )));
 
   hubEndTimePicker(context, locationIndex) => FormBuilderDateTimePicker(
-        name: 'hub_end_time_$locationIndex',
-        inputType: InputType.time,
-        initialTime: const TimeOfDay(hour: 20, minute: 0),
-        timePickerInitialEntryMode: TimePickerEntryMode.dial,
-        validator:
-            FormBuilderValidators.compose([FormBuilderValidators.required()]),
-        decoration: InputDecoration(
-            hintText: "End Time",
-            filled: true,
-            fillColor: Colors.white,
-            border: const OutlineInputBorder(),
-            labelText: 'End Time',
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                _formKey.currentState!.fields['hub_end_time']?.reset();
-              },
-            )),
-      );
+      name: 'hub_end_time_$locationIndex',
+      inputType: InputType.time,
+      initialTime: const TimeOfDay(hour: 20, minute: 0),
+      timePickerInitialEntryMode: TimePickerEntryMode.dial,
+      validator:
+          FormBuilderValidators.compose([FormBuilderValidators.required()]),
+      decoration: InputDecoration(
+          hintText: "End Time",
+          filled: true,
+          fillColor: Colors.white,
+          border: const OutlineInputBorder(),
+          labelText: 'End Time',
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              _formKey.currentState!.fields['hub_end_time_$locationIndex']
+                  ?.reset();
+            },
+          )));
 
   hubRemoveAllLocationsButton() {
     if (_additionalLocationsCount > 0) {
@@ -367,10 +315,14 @@ class _ContributeScreenState extends State<ContributeScreen> {
               debugPrint(_formKey.currentState?.value.toString());
               String? hubStartTime = _formKey
                   .currentState?.fields['hub_start_time_0']?.value
-                  .toString();
+                  .toString()
+                  .split(" ")[1]
+                  .substring(0, 5);
               String? hubEndTime = _formKey
                   .currentState?.fields['hub_end_time_0']?.value
-                  .toString();
+                  .toString()
+                  .split(" ")[1]
+                  .substring(0, 5);
 
               HubLocation newHubLocationDetails = HubLocation(
                   hubAddress:
@@ -390,7 +342,8 @@ class _ContributeScreenState extends State<ContributeScreen> {
                   hubId: uuidGenerator.v4(),
                   hubCategory:
                       _formKey.currentState?.fields['hub_category']?.value,
-                  hubRating: _formKey.currentState?.fields['hub_rating']?.value,
+                  hubRating: _formKey.currentState?.fields['hub_rating']?.value
+                      .toDouble(),
                   hubCostForTwo:
                       _formKey.currentState?.fields['hub_cost_for_two']?.value,
                   hubDescription:
@@ -542,6 +495,10 @@ class _ContributeScreenState extends State<ContributeScreen> {
                       heightSpacer,
                       ..._additonalLocationsArray,
                       hubRemoveAllLocationsButton(),
+                      Consumer<HubProvider>(
+                          builder: (context, hubProvider, child) =>
+                              showProgressMessage(
+                                  context, hubProvider.insertHubsResponse)),
                     ],
                   ),
                 ),
@@ -558,5 +515,48 @@ class _ContributeScreenState extends State<ContributeScreen> {
             ),
           )),
     )));
+  }
+
+  showProgressMessage(
+      BuildContext context, ApiResponse<dynamic>? insertHubsResponse) {
+    if (insertHubsResponse == null) {
+      return Column();
+    }
+    switch (insertHubsResponse.requestStatus) {
+      case RequestStatus.loading:
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text("Thanks for your contribution. Adding the Hub..."),
+          ],
+        );
+      case RequestStatus.completed:
+        Future.delayed(const Duration(milliseconds: 5000), () {
+          Navigator.pop(context);
+        });
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text("Hub added Sucessfully!"),
+            SizedBox(height: 20),
+            CircularProgressIndicator(),
+            SizedBox(height: 10),
+            Text("Redirecting in 5 seconds..."),
+          ],
+        );
+      case RequestStatus.error:
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('There was an error while adding Hub. Please re-submit'),
+            const SizedBox(height: 20),
+            Text(insertHubsResponse.statusMessage),
+          ],
+        );
+      default:
+        return Column();
+    }
   }
 }
