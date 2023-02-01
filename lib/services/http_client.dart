@@ -66,11 +66,12 @@ class HttpClient {
     return responseJson;
   }
 
-  Future<dynamic> postDataAndImage(dynamic body, XFile image) async {
+  Future<dynamic> sendDataAndImage(
+      String httpMethod, dynamic body, XFile image) async {
     var url = APIBase.baseURL;
     dynamic responseJson;
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(url));
+      var request = http.MultipartRequest(httpMethod, Uri.parse(url));
 
       request.headers['Content-Type'] = 'application/json';
       request.fields['hubDetails'] = jsonEncode(body);
