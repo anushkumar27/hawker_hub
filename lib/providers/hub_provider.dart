@@ -15,6 +15,9 @@ class HubProvider extends ChangeNotifier {
   // Insert Hubs Response
   ApiResponse<Hub>? _insertHubsResponse;
 
+  // Update Hubs Response
+  ApiResponse<Hub>? _updateHubsResponse;
+
   // Selected Hub
   String? _selectedHubId;
   // Selected Hub Location Array Index
@@ -25,10 +28,17 @@ class HubProvider extends ChangeNotifier {
 
   ApiResponse<List<Hub>> get hubs => _hubs;
   ApiResponse<Hub>? get insertHubsResponse => _insertHubsResponse;
+  ApiResponse<Hub>? get updateHubsResponse => _updateHubsResponse;
 
   // Init the services and get all hubs
   HubProvider() {
     _hubServices = HubServices();
+  }
+
+  resetResponses() {
+    _insertHubsResponse = null;
+    _updateHubsResponse = null;
+    notifyListeners();
   }
 
   setSelectedHubIdAndLocationArrayIndex(
@@ -57,11 +67,32 @@ class HubProvider extends ChangeNotifier {
     try {
       Hub hub = await _hubServices.insertHub(hubDetails, hubPhoto);
       _insertHubsResponse = ApiResponse.completed(hub);
+
+      // Remove if it already exist
+      _hubs.data.removeWhere((listHub) => listHub.hubId == hub.hubId);
       // Update the overall hub list
       _hubs.data.add(hub);
       notifyListeners();
     } catch (exception) {
       _insertHubsResponse = ApiResponse.error(exception.toString());
+      notifyListeners();
+    }
+  }
+
+  updateHub(Hub hubDetails, XFile hubPhoto) async {
+    _updateHubsResponse = ApiResponse.loading('Inserting Data');
+    notifyListeners();
+    try {
+      Hub hub = await _hubServices.updateHub(hubDetails, hubPhoto);
+      _updateHubsResponse = ApiResponse.completed(hub);
+
+      // Remove if it already exist
+      _hubs.data.removeWhere((listHub) => listHub.hubId == hub.hubId);
+      // Update the overall hub list
+      _hubs.data.add(hub);
+      notifyListeners();
+    } catch (exception) {
+      _updateHubsResponse = ApiResponse.error(exception.toString());
       notifyListeners();
     }
   }

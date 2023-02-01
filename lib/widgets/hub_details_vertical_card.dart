@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hawker_hub/models/hub.dart';
+import 'package:hawker_hub/screens/update_screen.dart';
 import 'package:hawker_hub/utilities/constants.dart';
 import 'package:hawker_hub/widgets/hub_details_base_card.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,13 +31,21 @@ class HubDetailsVerticalCard extends HubDetailsBaseCard {
     }
   }
 
-  Widget _hubCardButtonRow() => Padding(
+  Widget _hubCardButtonRow(BuildContext context) => Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             OutlinedButton(
-                onPressed: () => {}, child: const Text("Suggest Edit")),
+                onPressed: () => {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UpdateScreen(
+                                    oldHub: hubDetails,
+                                  ))),
+                    },
+                child: const Text("Suggest Edit")),
             ElevatedButton(
                 onPressed: _launchDirectionToHub,
                 child: const Text("Get Direction"))
@@ -72,7 +81,7 @@ class HubDetailsVerticalCard extends HubDetailsBaseCard {
               hubDetails.hubDescription,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            _hubCardButtonRow()
+            _hubCardButtonRow(context)
           ],
         ),
       ));

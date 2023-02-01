@@ -10,17 +10,24 @@ import 'package:hawker_hub/screens/hub_location_picker_screen.dart';
 import 'package:hawker_hub/services/api_response.dart';
 import 'package:hawker_hub/utilities/constants.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-class ContributeScreen extends StatefulWidget {
-  const ContributeScreen({super.key});
+class UpdateScreen extends StatefulWidget {
+  const UpdateScreen({super.key, required this.oldHub});
+
+  final Hub oldHub;
 
   @override
-  State<ContributeScreen> createState() => _ContributeScreenState();
+  State<UpdateScreen> createState() => _UpdateScreenState();
 }
 
-class _ContributeScreenState extends State<ContributeScreen> {
+class _UpdateScreenState extends State<UpdateScreen> {
+  late final Hub oldHub;
+  late final XFile oldHubPhoto;
+
   final _formKey = GlobalKey<FormBuilderState>();
 
   final _hubCategoryOptions = ['Food', 'Vegetables', 'Flowers', 'Other'];
@@ -28,7 +35,33 @@ class _ContributeScreenState extends State<ContributeScreen> {
   final List<Widget> _additonalLocationsArray = <Widget>[];
   // Index 0 is mandatory and hence starting additional locations count from 1
   int _additionalLocationsCount = 1;
-  var uuidGenerator = const Uuid();
+
+  @override
+  void initState() {
+    super.initState();
+    oldHub = widget.oldHub;
+    // Add all the locaitons
+    for (int i = 1; i < oldHub.hubLocations.length; i++) {
+      // Create a new location field
+      List<Widget> hubLocationFields =
+          getHubLocationFields(context, _additionalLocationsCount);
+      _additonalLocationsArray
+          .add(Text("Additional Location : $_additionalLocationsCount"));
+      _additonalLocationsArray.add(heightSpacer);
+      for (Widget widget in hubLocationFields) {
+        _additonalLocationsArray.add(widget);
+      }
+      _additonalLocationsArray.add(heightSpacer);
+
+      _additionalLocationsCount++;
+    }
+  }
+
+  static Future<XFile> getImageXFileByUrl(String url) async {
+    var file = await DefaultCacheManager().getSingleFile(url);
+    XFile result = XFile(file.path);
+    return result;
+  }
 
   hubRatingBar(context) => FormBuilderRatingBar(
         decoration: const InputDecoration(labelText: 'Hub Rating'),
@@ -36,7 +69,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         wrapAlignment: WrapAlignment.center,
         allowHalfRating: true,
         itemSize: 50.0,
-        initialValue: 2.5,
+        initialValue: oldHub.hubRating,
         maxRating: 5.0,
         unratedColor: Theme.of(context).colorScheme.primary,
         glowColor: Theme.of(context).colorScheme.primary,
@@ -52,6 +85,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         previewAutoSizeWidth: true,
         validator:
             FormBuilderValidators.compose([FormBuilderValidators.required()]),
+        initialValue: [oldHub.hubPhoto],
       );
 
   hubNameTextField(context) => FormBuilderTextField(
@@ -76,6 +110,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         ]),
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
+        initialValue: oldHub.hubName,
       );
 
   hubDescriptionTextField(context) => FormBuilderTextField(
@@ -99,6 +134,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         ]),
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
+        initialValue: oldHub.hubDescription,
       );
 
   hubCategoryDropdown(context) => FormBuilderDropdown<String>(
@@ -121,6 +157,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
                 ))
             .toList(),
         valueTransformer: (val) => val?.toString(),
+        initialValue: oldHub.hubCategory,
       );
 
   hubCostTextField(context) => FormBuilderTextField(
@@ -145,6 +182,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         ]),
         keyboardType: TextInputType.number,
         textInputAction: TextInputAction.next,
+        initialValue: oldHub.hubCostForTwo,
       );
 
   hubAddressTextField(context, locationIndex) => FormBuilderTextField(
@@ -168,6 +206,9 @@ class _ContributeScreenState extends State<ContributeScreen> {
             FormBuilderValidators.compose([FormBuilderValidators.required()]),
         keyboardType: TextInputType.streetAddress,
         textInputAction: TextInputAction.next,
+        initialValue: locationIndex < oldHub.hubLocations.length
+            ? oldHub.hubLocations[locationIndex].hubAddress
+            : null,
       );
 
   hubAddressLatitude(context, locationIndex) => FormBuilderField(
@@ -180,6 +221,9 @@ class _ContributeScreenState extends State<ContributeScreen> {
           //Empty widget
           return const SizedBox.shrink();
         },
+        initialValue: locationIndex < oldHub.hubLocations.length
+            ? oldHub.hubLocations[locationIndex].hubLatitude
+            : null,
       );
 
   hubAddressLongitude(context, locationIndex) => FormBuilderField(
@@ -192,6 +236,9 @@ class _ContributeScreenState extends State<ContributeScreen> {
           //Empty widget
           return const SizedBox.shrink();
         },
+        initialValue: locationIndex < oldHub.hubLocations.length
+            ? oldHub.hubLocations[locationIndex].hubLongitude
+            : null,
       );
 
   hubPhoneNumberTextField(context, locationIndex) => FormBuilderPhoneField(
@@ -217,53 +264,63 @@ class _ContributeScreenState extends State<ContributeScreen> {
         ]),
         keyboardType: TextInputType.phone,
         textInputAction: TextInputAction.next,
+        initialValue: locationIndex < oldHub.hubLocations.length
+            ? oldHub.hubLocations[locationIndex].hubPhoneNumber
+            : null,
       );
 
   hubDaysOfOperationCheckBox(context, locationIndex) =>
       FormBuilderCheckboxGroup<String>(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        decoration: const InputDecoration(labelText: 'Days of Operation'),
-        name: 'hub_days_of_operation_$locationIndex',
-        // initialValue: const ['Dart'],
-        options: const [
-          FormBuilderFieldOption(value: 'Monday'),
-          FormBuilderFieldOption(value: 'Tuesday'),
-          FormBuilderFieldOption(value: 'Wednesday'),
-          FormBuilderFieldOption(value: 'Thursday'),
-          FormBuilderFieldOption(value: 'Friday'),
-          FormBuilderFieldOption(value: 'Saturday'),
-          FormBuilderFieldOption(value: 'Sunday'),
-        ],
-        separator: const VerticalDivider(
-          width: 10,
-          thickness: 5,
-          color: Colors.red,
-        ),
-        validator: FormBuilderValidators.compose([
-          FormBuilderValidators.minLength(1),
-        ]),
-      );
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          decoration: const InputDecoration(labelText: 'Days of Operation'),
+          name: 'hub_days_of_operation_$locationIndex',
+          // initialValue: const ['Dart'],
+          options: const [
+            FormBuilderFieldOption(value: 'Monday'),
+            FormBuilderFieldOption(value: 'Tuesday'),
+            FormBuilderFieldOption(value: 'Wednesday'),
+            FormBuilderFieldOption(value: 'Thursday'),
+            FormBuilderFieldOption(value: 'Friday'),
+            FormBuilderFieldOption(value: 'Saturday'),
+            FormBuilderFieldOption(value: 'Sunday'),
+          ],
+          separator: const VerticalDivider(
+            width: 10,
+            thickness: 5,
+            color: Colors.red,
+          ),
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.minLength(1),
+          ]),
+          initialValue: locationIndex < oldHub.hubLocations.length
+              ? oldHub.hubLocations[locationIndex].hubDaysOfOperation
+              : null);
 
   hubStartTimePicker(context, locationIndex) => FormBuilderDateTimePicker(
-      name: 'hub_start_time_$locationIndex',
-      inputType: InputType.time,
-      initialTime: const TimeOfDay(hour: 8, minute: 0),
-      timePickerInitialEntryMode: TimePickerEntryMode.dial,
-      validator:
-          FormBuilderValidators.compose([FormBuilderValidators.required()]),
-      decoration: InputDecoration(
-          hintText: "Start Time",
-          filled: true,
-          fillColor: Colors.white,
-          border: const OutlineInputBorder(),
-          labelText: 'Start Time',
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () {
-              _formKey.currentState!.fields['hub_start_time_$locationIndex']
-                  ?.reset();
-            },
-          )));
+        name: 'hub_start_time_$locationIndex',
+        inputType: InputType.time,
+        initialTime: const TimeOfDay(hour: 8, minute: 0),
+        timePickerInitialEntryMode: TimePickerEntryMode.dial,
+        validator:
+            FormBuilderValidators.compose([FormBuilderValidators.required()]),
+        decoration: InputDecoration(
+            hintText: "Start Time",
+            filled: true,
+            fillColor: Colors.white,
+            border: const OutlineInputBorder(),
+            labelText: 'Start Time',
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                _formKey.currentState!.fields['hub_start_time_$locationIndex']
+                    ?.reset();
+              },
+            )),
+        initialValue: locationIndex < oldHub.hubLocations.length
+            ? DateFormat('hh:mm')
+                .parse(oldHub.hubLocations[locationIndex].hubStartTime)
+            : null,
+      );
 
   hubEndTimePicker(context, locationIndex) => FormBuilderDateTimePicker(
       name: 'hub_end_time_$locationIndex',
@@ -284,7 +341,11 @@ class _ContributeScreenState extends State<ContributeScreen> {
               _formKey.currentState!.fields['hub_end_time_$locationIndex']
                   ?.reset();
             },
-          )));
+          )),
+      initialValue: locationIndex < oldHub.hubLocations.length
+          ? DateFormat('hh:mm')
+              .parse(oldHub.hubLocations[locationIndex].hubEndTime)
+          : null);
 
   hubRemoveAllLocationsButton() {
     if (_additionalLocationsCount > 1) {
@@ -311,7 +372,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
           style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xff6750a4),
               foregroundColor: Colors.white),
-          onPressed: () {
+          onPressed: () async {
             if (_formKey.currentState?.saveAndValidate() ?? false) {
               debugPrint(_formKey.currentState?.value.toString());
 
@@ -349,7 +410,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
               }
 
               Hub newHubDetails = Hub(
-                  hubId: uuidGenerator.v4(),
+                  hubId: oldHub.hubId,
                   hubCategory:
                       _formKey.currentState?.fields['hub_category']?.value,
                   hubRating: _formKey.currentState?.fields['hub_rating']?.value
@@ -363,12 +424,19 @@ class _ContributeScreenState extends State<ContributeScreen> {
                   hubPhoto: 's3_url');
 
               // Only one image
-              XFile hubPhoto =
-                  _formKey.currentState?.fields['hub_photo']?.value[0];
+              XFile hubPhoto;
+
+              if (_formKey.currentState?.fields['hub_photo']?.value[0]
+                      .runtimeType !=
+                  XFile) {
+                hubPhoto = await getImageXFileByUrl(oldHub.hubPhoto);
+              } else {
+                hubPhoto = _formKey.currentState?.fields['hub_photo']?.value[0];
+              }
 
               // Insert hub
               Provider.of<HubProvider>(context, listen: false)
-                  .insertHub(newHubDetails, hubPhoto);
+                  .updateHub(newHubDetails, hubPhoto);
             } else {
               debugPrint(_formKey.currentState?.value.toString());
               debugPrint('validation failed');
@@ -471,7 +539,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
         child: SizedBox.expand(
             child: Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text("Contribute")),
+        title: const Center(child: Text("Suggest Edit")),
         backgroundColor: Constants.primarySurfaceColor,
       ),
       body: Container(
@@ -511,7 +579,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
                       Consumer<HubProvider>(
                           builder: (context, hubProvider, child) =>
                               showProgressMessage(
-                                  context, hubProvider.insertHubsResponse)),
+                                  context, hubProvider.updateHubsResponse)),
                     ],
                   ),
                 ),
@@ -531,11 +599,11 @@ class _ContributeScreenState extends State<ContributeScreen> {
   }
 
   showProgressMessage(
-      BuildContext context, ApiResponse<dynamic>? insertHubsResponse) {
-    if (insertHubsResponse == null) {
+      BuildContext context, ApiResponse<dynamic>? updateHubsResponse) {
+    if (updateHubsResponse == null) {
       return Column();
     }
-    switch (insertHubsResponse.requestStatus) {
+    switch (updateHubsResponse.requestStatus) {
       case RequestStatus.loading:
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -543,7 +611,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
             SizedBox(height: 20),
             CircularProgressIndicator(),
             SizedBox(height: 20),
-            Text("Thanks for your contribution. Adding the Hub..."),
+            Text("Thanks for your contribution. Updating the Hub..."),
           ],
         );
       case RequestStatus.completed:
@@ -555,7 +623,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
             SizedBox(height: 20),
-            Text("Hub added Sucessfully!"),
+            Text("Hub updated Sucessfully!"),
             SizedBox(height: 20),
             CircularProgressIndicator(),
             SizedBox(height: 10),
@@ -569,7 +637,7 @@ class _ContributeScreenState extends State<ContributeScreen> {
             const SizedBox(height: 20),
             const Text('There was an error while adding Hub. Please re-submit'),
             const SizedBox(height: 20),
-            Text(insertHubsResponse.statusMessage),
+            Text(updateHubsResponse.statusMessage),
           ],
         );
       default:
