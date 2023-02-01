@@ -53,7 +53,7 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
     mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
             target: LatLng(
                 hubDetails.hubLocations[hubLocationArrayIndex].hubLatitude,
-                hubDetails.hubLocations[hubLocationArrayIndex].hubLogitude),
+                hubDetails.hubLocations[hubLocationArrayIndex].hubLongitude),
             zoom: 15)
         //15 is new zoom level
         ));
@@ -61,7 +61,7 @@ class HubDetailsHorizontalCard extends HubDetailsBaseCard {
 
   Future<void> _launchDirectionToHub() async {
     final String googleMapslocationUrl =
-        "https://www.google.com/maps/search/?api=1&query=${hubDetails.hubLocations[hubLocationArrayIndex].hubLatitude},${hubDetails.hubLocations[hubLocationArrayIndex].hubLogitude}";
+        "https://www.google.com/maps/search/?api=1&query=${hubDetails.hubLocations[hubLocationArrayIndex].hubLatitude},${hubDetails.hubLocations[hubLocationArrayIndex].hubLongitude}";
 
     final Uri encodedURI = Uri.parse(googleMapslocationUrl);
     if (!await launchUrl(encodedURI)) {

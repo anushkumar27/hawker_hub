@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:hawker_hub/models/hub.dart';
 import 'package:hawker_hub/services/api_response.dart';
 import 'package:hawker_hub/services/hub_services.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// Hub Provider
 /// Main provider, holds data of all the retrived Hubs
@@ -10,6 +11,9 @@ class HubProvider extends ChangeNotifier {
 
   // Hubs Data
   late ApiResponse<List<Hub>> _hubs;
+
+  // Insert Hubs Response
+  ApiResponse<Hub>? _insertHubsResponse;
 
   // Selected Hub
   String? _selectedHubId;
@@ -20,6 +24,7 @@ class HubProvider extends ChangeNotifier {
   int? get selectedHubLocationArrayIndex => _selectedHubLocationArrayIndex;
 
   ApiResponse<List<Hub>> get hubs => _hubs;
+  ApiResponse<Hub>? get insertHubsResponse => _insertHubsResponse;
 
   // Init the services and get all hubs
   HubProvider() {
@@ -42,6 +47,21 @@ class HubProvider extends ChangeNotifier {
       notifyListeners();
     } catch (exception) {
       _hubs = ApiResponse.error(exception.toString());
+      notifyListeners();
+    }
+  }
+
+  insertHub(Hub hubDetails, XFile hubPhoto) async {
+    _insertHubsResponse = ApiResponse.loading('Inserting Data');
+    notifyListeners();
+    try {
+      Hub hub = await _hubServices.insertHub(hubDetails, hubPhoto);
+      _insertHubsResponse = ApiResponse.completed(hub);
+      // Update the overall hub list
+      _hubs.data.add(hub);
+      notifyListeners();
+    } catch (exception) {
+      _insertHubsResponse = ApiResponse.error(exception.toString());
       notifyListeners();
     }
   }

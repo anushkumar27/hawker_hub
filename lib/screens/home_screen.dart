@@ -8,6 +8,7 @@ import 'package:hawker_hub/services/api_response.dart';
 import 'package:hawker_hub/widgets/hub_details_horizontal_card.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:location/location.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,10 +18,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Location service
+  final Location _locationService = Location();
+
   final double _initialContributeButtonHeight = 100.0;
   final double _minExplorePanelHeight = 95.0;
   final LatLng _center = const LatLng(45.521563, -122.677433);
   final _explorePanelMargins = const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0);
+
   final _explorePanelDrawerIndicator = Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
@@ -33,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ],
   );
+
   final _explorePanelPaddingBox = const SizedBox(
     height: 18.0,
   );
@@ -41,8 +47,19 @@ class _HomeScreenState extends State<HomeScreen> {
   double _maxExplorePanelHeight = 0;
   late GoogleMapController mapController;
 
-  void _onMapCreated(GoogleMapController controller) {
+  Future<void> _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
+
+    // Move map to user's current location
+    final latestCurrentLocation = await _locationService.getLocation();
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+            target: LatLng(latestCurrentLocation.latitude!,
+                latestCurrentLocation.longitude!),
+            zoom: 15),
+      ),
+    );
   }
 
   void _updateContributeButtonPosition(double position) => setState(() {
@@ -70,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Index is appended as one hub can have multiple locations
               markerId: MarkerId(hub.hubId + index.toString()),
               position:
-                  LatLng(hubLocation.hubLatitude, hubLocation.hubLogitude),
+                  LatLng(hubLocation.hubLatitude, hubLocation.hubLongitude),
               infoWindow: InfoWindow(
                 title: "${hub.hubName} (${hub.hubRating})",
                 snippet: hubLocation.hubAddress,
@@ -131,7 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: const InputDecoration(
               hintText: "Name, Category, Food trucks..",
               prefixIcon: Icon(Icons.search),
-              suffixIcon: Icon(Icons.cancel_outlined),
               filled: true,
               fillColor: Colors.white,
               border: OutlineInputBorder(),
