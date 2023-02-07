@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:hawker_hub/models/hub.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +11,7 @@ abstract class HubDetailsBaseCard extends StatelessWidget {
   bool isOpen(String startTimeString, String endTimeString) {
     try {
       // Get the current time
-      DateTime currentDateTime = DateTime.now();
+      DateTime currentDateTime = clock.now();
 
       // Appending current date to start and end time for comparison
       String currentDate = DateFormat('yyyy-MM-dd').format(currentDateTime);
