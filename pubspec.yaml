@@ -58,6 +58,7 @@ dependencies:
   flutter_cache_manager: ^3.3.0
   network_image_mock: ^2.1.1
   clock: ^1.1.1
+  flutter_chips_input: ^2.0.0
 
 dev_dependencies:
   flutter_test:
