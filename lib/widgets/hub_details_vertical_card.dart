@@ -31,26 +31,23 @@ class HubDetailsVerticalCard extends HubDetailsBaseCard {
     }
   }
 
-  Widget _hubCardButtonRow(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            OutlinedButton(
-                onPressed: () => {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => UpdateScreen(
-                                    oldHub: hubDetails,
-                                  ))),
-                    },
-                child: const Text("Suggest Edit")),
-            ElevatedButton(
-                onPressed: _launchDirectionToHub,
-                child: const Text("Get Direction"))
-          ],
-        ),
+  Widget _hubCardButtonRow(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          OutlinedButton(
+              onPressed: () => {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UpdateScreen(
+                                  oldHub: hubDetails,
+                                ))),
+                  },
+              child: const Text("Suggest Edit")),
+          ElevatedButton(
+              onPressed: _launchDirectionToHub,
+              child: const Text("Get Direction"))
+        ],
       );
 
   Widget _hubTitleRow(BuildContext context) => Padding(
@@ -65,8 +62,7 @@ class HubDetailsVerticalCard extends HubDetailsBaseCard {
       );
 
   Widget _hubDescription(BuildContext context) => Padding(
-      padding: const EdgeInsets.all(20),
-      child: Expanded(
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -81,10 +77,11 @@ class HubDetailsVerticalCard extends HubDetailsBaseCard {
               hubDetails.hubDescription,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
+            heightSpacer,
             _hubCardButtonRow(context)
           ],
         ),
-      ));
+      );
 
   @override
   Widget build(BuildContext context) {

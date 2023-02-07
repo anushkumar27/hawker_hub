@@ -30,12 +30,8 @@ class HubProvider extends ChangeNotifier {
   ApiResponse<Hub>? get insertHubsResponse => _insertHubsResponse;
   ApiResponse<Hub>? get updateHubsResponse => _updateHubsResponse;
 
-  HubProvider.fromHubService(HubServices hubServices) {
+  HubProvider(HubServices hubServices) {
     _hubServices = hubServices;
-  }
-
-  HubProvider() {
-    _hubServices = HubServices();
   }
 
   resetResponses() {

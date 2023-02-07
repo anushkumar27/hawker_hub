@@ -1,6 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:hawker_hub/providers/hub_provider.dart';
 import 'package:hawker_hub/screens/home_screen.dart';
+import 'package:hawker_hub/services/hub_services.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +9,7 @@ import 'utilities/constants.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
-    create: (context) => HubProvider(),
+    create: (context) => HubProvider(HubServices()),
     child: HawkerHubRoot(),
   ));
 }

@@ -44,7 +44,7 @@ void main() {
   // Setup is called before each test is run
   setUp(() {
     mockHubServices = MockHubServices();
-    testHubProvider = HubProvider.fromHubService(mockHubServices);
+    testHubProvider = HubProvider(mockHubServices);
     mockXfileImage = XFile("");
   });
 
