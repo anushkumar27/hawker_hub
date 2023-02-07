@@ -65,7 +65,7 @@ void main() {
       await tester.pumpWidget(makeTestableWidget(
           child: HubDetailsVerticalCard(
               hubDetails: getStaticHubDetails(), hubLocationArrayIndex: 0)));
-      await tester.pump(const Duration(seconds: 5));
+      await tester.pump(const Duration(milliseconds: 500));
 
       final hubTitle = find.text(getStaticHubDetails().hubName);
       final hubRating = find.text(getStaticHubDetails().hubRating.toString());
@@ -91,7 +91,7 @@ void main() {
               child: HubDetailsVerticalCard(
                   hubDetails: getStaticHubDetails(),
                   hubLocationArrayIndex: 0)));
-          await tester.pump(const Duration(seconds: 5));
+          await tester.pump(const Duration(milliseconds: 500));
 
           final hubOpenStatus = find.text("OPEN");
           expect(hubOpenStatus, findsOneWidget);
@@ -110,7 +110,7 @@ void main() {
               child: HubDetailsVerticalCard(
                   hubDetails: getStaticHubDetails(),
                   hubLocationArrayIndex: 0)));
-          await tester.pump(const Duration(seconds: 5));
+          await tester.pump(const Duration(milliseconds: 500));
 
           final hubOpenStatus = find.text("CLOSED");
           expect(hubOpenStatus, findsOneWidget);
