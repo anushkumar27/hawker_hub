@@ -30,7 +30,10 @@ class HubProvider extends ChangeNotifier {
   ApiResponse<Hub>? get insertHubsResponse => _insertHubsResponse;
   ApiResponse<Hub>? get updateHubsResponse => _updateHubsResponse;
 
-  // Init the services and get all hubs
+  HubProvider.fromHubService(HubServices hubServices) {
+    _hubServices = hubServices;
+  }
+
   HubProvider() {
     _hubServices = HubServices();
   }
@@ -80,7 +83,7 @@ class HubProvider extends ChangeNotifier {
   }
 
   updateHub(Hub hubDetails, XFile hubPhoto) async {
-    _updateHubsResponse = ApiResponse.loading('Inserting Data');
+    _updateHubsResponse = ApiResponse.loading('Updating Data');
     notifyListeners();
     try {
       Hub hub = await _hubServices.updateHub(hubDetails, hubPhoto);
