@@ -189,6 +189,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
         autovalidateMode: AutovalidateMode.onUserInteraction,
         readOnly: true,
         name: 'hub_address_$locationIndex',
+        key: Key('hub_address_$locationIndex'),
         decoration: InputDecoration(
             hintText: "Pick an address (Read-only)",
             filled: true,
@@ -213,6 +214,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
   hubAddressLatitude(context, locationIndex) => FormBuilderField(
         name: 'hub_address_lat_$locationIndex',
+        key: Key('hub_address_lat_$locationIndex'),
         enabled: false,
         validator: FormBuilderValidators.compose([
           FormBuilderValidators.required(),
@@ -228,6 +230,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
   hubAddressLongitude(context, locationIndex) => FormBuilderField(
         name: 'hub_address_long_$locationIndex',
+        key: Key('hub_address_long_$locationIndex'),
         enabled: false,
         validator: FormBuilderValidators.compose([
           FormBuilderValidators.required(),
@@ -244,6 +247,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
   hubPhoneNumberTextField(context, locationIndex) => FormBuilderPhoneField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         name: 'hub_phone_number_$locationIndex',
+        key: Key('hub_phone_number_$locationIndex'),
         decoration: InputDecoration(
             hintText: "Hub Phone Number",
             filled: true,
@@ -274,7 +278,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: const InputDecoration(labelText: 'Days of Operation'),
           name: 'hub_days_of_operation_$locationIndex',
-          // initialValue: const ['Dart'],
+          key: Key('hub_days_of_operation_$locationIndex'),
           options: const [
             FormBuilderFieldOption(value: 'Monday'),
             FormBuilderFieldOption(value: 'Tuesday'),
@@ -298,6 +302,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
   hubStartTimePicker(context, locationIndex) => FormBuilderDateTimePicker(
         name: 'hub_start_time_$locationIndex',
+        key: Key('hub_start_time_$locationIndex'),
         inputType: InputType.time,
         initialTime: const TimeOfDay(hour: 8, minute: 0),
         timePickerInitialEntryMode: TimePickerEntryMode.dial,
@@ -324,6 +329,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
   hubEndTimePicker(context, locationIndex) => FormBuilderDateTimePicker(
       name: 'hub_end_time_$locationIndex',
+      key: Key('hub_end_time_$locationIndex'),
       inputType: InputType.time,
       initialTime: const TimeOfDay(hour: 20, minute: 0),
       timePickerInitialEntryMode: TimePickerEntryMode.dial,
