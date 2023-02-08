@@ -32,6 +32,8 @@ class HubProvider extends ChangeNotifier {
 
   HubProvider(HubServices hubServices) {
     _hubServices = hubServices;
+    // Init _hubs
+    _hubs = ApiResponse.loading('Fetching Data');
   }
 
   resetResponses() {

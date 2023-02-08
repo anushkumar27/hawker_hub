@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   double _currentContributeButtonHeight = 0;
   double _maxExplorePanelHeight = 0;
-  late GoogleMapController mapController;
+  GoogleMapController? mapController;
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
@@ -74,7 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _currentContributeButtonHeight = _initialContributeButtonHeight;
 
     // Get all the hubs
-    Provider.of<HubProvider>(context, listen: false).fetchAllHubs();
+    Future.microtask(
+        () => Provider.of<HubProvider>(context, listen: false).fetchAllHubs());
   }
 
   Set<Marker> getHubMarkers(ApiResponse<List<Hub>> hubDetails) {
