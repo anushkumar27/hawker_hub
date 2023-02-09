@@ -1,16 +1,18 @@
+import "package:equatable/equatable.dart";
+
 /// Hub Model
 /// Stores a Hub's details
-class Hub {
-  String hubId;
-  double hubRating;
-  String hubPhoto;
-  String hubName;
-  String hubDescription;
-  String hubCategory;
-  String hubCostForTwo;
-  List<HubLocation> hubLocations;
+class Hub extends Equatable {
+  final String hubId;
+  final double hubRating;
+  final String hubPhoto;
+  final String hubName;
+  final String hubDescription;
+  final String hubCategory;
+  final String hubCostForTwo;
+  final List<HubLocation> hubLocations;
 
-  Hub(
+  const Hub(
       {required this.hubId,
       required this.hubRating,
       required this.hubPhoto,
@@ -51,18 +53,30 @@ class Hub {
             .map((hubLocation) => hubLocation.toJson())
             .toList(growable: false)
       };
+
+  @override
+  List<Object?> get props => [
+        hubId,
+        hubRating,
+        hubPhoto,
+        hubName,
+        hubDescription,
+        hubCategory,
+        hubCostForTwo,
+        hubLocations
+      ];
 }
 
-class HubLocation {
-  String hubAddress;
-  double hubLatitude;
-  double hubLongitude;
-  String hubPhoneNumber;
-  List<String> hubDaysOfOperation;
-  String hubStartTime;
-  String hubEndTime;
+class HubLocation extends Equatable {
+  final String hubAddress;
+  final double hubLatitude;
+  final double hubLongitude;
+  final String hubPhoneNumber;
+  final List<String> hubDaysOfOperation;
+  final String hubStartTime;
+  final String hubEndTime;
 
-  HubLocation(
+  const HubLocation(
       {required this.hubAddress,
       required this.hubLatitude,
       required this.hubLongitude,
@@ -93,4 +107,15 @@ class HubLocation {
       "hub_end_time": hubEndTime
     };
   }
+
+  @override
+  List<Object?> get props => [
+        hubAddress,
+        hubLatitude,
+        hubLongitude,
+        hubPhoneNumber,
+        hubDaysOfOperation,
+        hubStartTime,
+        hubEndTime
+      ];
 }
