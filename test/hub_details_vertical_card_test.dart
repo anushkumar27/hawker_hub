@@ -19,7 +19,7 @@ void main() {
   late HubProvider testHubProvider;
 
   Hub getStaticHubDetails() {
-    return Hub(
+    return const Hub(
         hubId: "ec20da91-1ddc-44f6-a0f4-ec3102608d98",
         hubRating: 4.5,
         hubPhoto: "RANDOM_URL",

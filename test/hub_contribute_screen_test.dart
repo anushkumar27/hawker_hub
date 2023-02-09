@@ -31,7 +31,7 @@ void main() {
         hubDescription: "Mock Hub Description",
         hubCategory: "Others",
         hubCostForTwo: "99",
-        hubLocations: [
+        hubLocations: const [
           HubLocation(
               hubAddress: "Mock Hub Address",
               hubDaysOfOperation: ["Monday"],

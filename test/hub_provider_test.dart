@@ -32,7 +32,7 @@ void main() {
         hubLocations: [
           HubLocation(
               hubAddress: Random().toString(),
-              hubDaysOfOperation: ["Monday"],
+              hubDaysOfOperation: const ["Monday"],
               hubEndTime: "15:00",
               hubStartTime: "10:00",
               hubPhoneNumber: Random().toString(),
